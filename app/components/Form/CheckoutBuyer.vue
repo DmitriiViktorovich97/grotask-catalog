@@ -1,16 +1,8 @@
 <script setup lang="ts">
-import {reactive} from 'vue'
-import VxInput from "./UI/VxInput.vue";
+import VxInput from "../UI/VxInput.vue";
+import VxCheckbox from "../UI/VxCheckbox.vue";
 
-const form = reactive({
-  firstName: '',
-  lastName: '',
-  phone: '',
-  email: '',
-  comment: '',
-  subscribe: false
-})
-
+const form = defineModel<any>({ required: true })
 const clearField = (field: keyof typeof form) => {
   form[field] = ''
 }
@@ -18,7 +10,6 @@ const clearField = (field: keyof typeof form) => {
 
 <template>
   <div class="buyer-card">
-    <!-- Шапка блока -->
     <div class="buyer-header">
       <h2 class="buyer-title">Покупатель</h2>
       <p class="buyer-subtitle">Укажите свои данные для покупки наших товаров</p>
@@ -32,80 +23,21 @@ const clearField = (field: keyof typeof form) => {
         <VxInput v-model="form.firstName" label="Имя" placeholder="Иван" required/>
 
         <!-- Фамилия -->
-        <div class="form-group">
-          <label class="form-label">Фамилия<span class="req">*</span></label>
-          <div class="input-wrapper">
-            <input
-                v-model="form.lastName"
-                type="text"
-                placeholder="Иванов"
-                class="form-input"
-            >
-            <button
-                v-if="form.lastName"
-                type="button"
-                class="clear-btn"
-                @click="clearField('lastName')"
-                aria-label="Очистить"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
+        <VxInput v-model="form.lastName" label="Фамилия" placeholder="Иванов" required/>
 
         <!-- Телефон -->
-        <div class="form-group">
-          <label class="form-label">Телефон</label>
-          <div class="input-wrapper">
-            <span class="input-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                   stroke-linecap="round" stroke-linejoin="round"><path
-                  d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            </span>
-            <input
-                v-model="form.phone"
-                type="tel"
-                placeholder="+7 800 555 35 35"
-                class="form-input has-icon"
-            >
-            <button
-                v-if="form.phone"
-                type="button"
-                class="clear-btn"
-                @click="clearField('phone')"
-                aria-label="Очистить"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
+        <VxInput v-model="form.phone" label="Телефон" placeholder="8 800 555 35 35" required>
+          <template #icon>
+            <img src="/phone.svg" alt="phone">
+          </template>
+        </VxInput>
 
         <!-- Почта -->
-        <div class="form-group">
-          <label class="form-label">Почта</label>
-          <div class="input-wrapper">
-            <span class="input-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                   stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path
-                  d="M22 7l-10 7L2 7"/></svg>
-            </span>
-            <input
-                v-model="form.email"
-                type="email"
-                placeholder="mail@example.com"
-                class="form-input has-icon"
-            >
-            <button
-                v-if="form.email"
-                type="button"
-                class="clear-btn"
-                @click="clearField('email')"
-                aria-label="Очистить"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
+        <VxInput v-model="form.email" label="Почта" placeholder="mail@example.com" required>
+          <template #icon>
+            <img src="/mail.svg" alt="phone">
+          </template>
+        </VxInput>
       </div>
 
       <div class="form-alert">
@@ -128,19 +60,15 @@ const clearField = (field: keyof typeof form) => {
       </div>
 
       <!-- Чекбокс подписки -->
-      <label class="custom-checkbox">
-        <input v-model="form.subscribe" type="checkbox">
-        <span class="checkmark"></span>
-        <span class="checkbox-text">Хочу получать уведомления о скидках и специальных предложениях</span>
-      </label>
+      <VxCheckbox v-model="form.subscribe">
+        Хочу получать уведомления о скидках и специальных предложениях
+      </VxCheckbox>
 
     </form>
   </div>
 </template>
 
 <style scoped>
-@import '../assets/css/checkbox.css';
-
 .buyer-card {
   background: #ffffff;
   border: 1px solid #f0f0f0;
@@ -185,71 +113,6 @@ const clearField = (field: keyof typeof form) => {
   color: #777;
 }
 
-.req {
-  color: #e31e24; /* Красная звездочка */
-}
-
-/* Обертка для инпута (чтобы позиционировать иконки и крестики) */
-.input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.form-input {
-  width: 100%;
-  height: clamp(44px, 3.5vw, 52px);
-  background-color: #f5f5f5;
-  border: 1px solid transparent;
-  border-radius: clamp(8px, 1vw, 12px);
-  padding: 0 16px;
-  font-size: 14px;
-  color: #111;
-  transition: border-color 0.2s, background-color 0.2s;
-}
-
-.form-input.has-icon {
-  padding-left: 44px; /* Оставляем место для иконки */
-}
-
-.form-input::placeholder {
-  color: #a0a0a0;
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: #ccc;
-  background-color: #fff;
-}
-
-/* Иконки внутри инпутов */
-.input-icon {
-  position: absolute;
-  left: 16px;
-  color: #999;
-  display: flex;
-  pointer-events: none;
-}
-
-/* Кнопка очистки (крестик) */
-.clear-btn {
-  position: absolute;
-  right: 16px;
-  background: none;
-  border: none;
-  color: #a0a0a0;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px;
-  transition: color 0.2s;
-}
-
-.clear-btn:hover {
-  color: #333;
-}
-
 /* Блок предупреждения */
 .form-alert {
   display: flex;
@@ -270,7 +133,6 @@ const clearField = (field: keyof typeof form) => {
   margin-top: 2px;
 }
 
-/* Текстовое поле */
 .comment-group {
   margin-bottom: 24px;
 }
@@ -284,7 +146,7 @@ const clearField = (field: keyof typeof form) => {
   padding: 16px;
   font-size: 14px;
   color: #111;
-  resize: vertical; /* Позволяем менять высоту */
+  resize: vertical;
   font-family: inherit;
   transition: border-color 0.2s, background-color 0.2s;
 }
@@ -299,10 +161,9 @@ const clearField = (field: keyof typeof form) => {
   background-color: #fff;
 }
 
-/* Адаптив для мобилок */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .form-grid {
-    grid-template-columns: 1fr; /* В одну колонку */
+    grid-template-columns: 1fr;
   }
 }
 </style>

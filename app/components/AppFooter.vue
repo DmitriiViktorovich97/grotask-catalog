@@ -1,28 +1,52 @@
 <template>
   <footer class="footer">
+    <div class="container">
+      <div class="line"></div>
+    </div>
     <div class="container footer__in">
-      <span class="footer__copy">Все права защищены 2026</span>
-      <div class="logo">
-        <span class="logo__flag" aria-hidden="true" />
-        <span class="logo__text">
-          <small>Интернет-магазин</small>
-          <b>ГРОТЕСК</b>
-        </span>
-      </div>
+      <span class="footer__copy">@ Company name 2026</span>
+      <AppLogo></AppLogo>
     </div>
   </footer>
 </template>
 
 <style scoped>
-.footer { height: var(--footer-h); background: var(--c-footer); margin-top: 32px; }
-.footer__in { height: 100%; display: flex; align-items: flex-end; justify-content: space-between; padding-bottom: 32px; }
-.footer__copy { font-size: 12px; color: #a59aa0; }
-.logo { display: flex; align-items: center; gap: 6px; }
-.logo__flag {
-  width: 22px; height: 22px; border-radius: 50%;
-  background: linear-gradient(#fff 0 33%, #1c4fd8 33% 66%, #e5223b 66%);
+.footer {
+  height: var(--footer-h);
+  padding-top: 44px;
+  background: var(--c-footer);
+  margin-top: 32px;
 }
-.logo__text { display: flex; flex-direction: column; line-height: 1; gap: 1px; }
-.logo__text small { font-size: 7px; color: #7b6f75; }
-.logo__text b { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; }
+
+.footer__in {
+  height: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding-top: 48px;
+  padding-bottom: 32px;
+  text-decoration: none;
+}
+
+.line {
+  height: 2px;
+  background: var(--c-line);
+}
+
+.footer__copy {
+  font-size: 12px;
+  color: #a59aa0;
+}
+
+@media (max-width: 768px) {
+  .footer {
+    padding-top: 20px;
+  }
+
+  .footer__in {
+    flex-direction: column;
+    padding-top: 20px;
+    padding-bottom: 60px;
+  }
+}
 </style>

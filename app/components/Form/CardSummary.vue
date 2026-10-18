@@ -1,22 +1,14 @@
 <script setup lang="ts">
-import { useRouter, useRoute } from 'vue-router'
-import VxInput from "./UI/VxInput.vue";
+import { useRoute } from 'vue-router'
+import VxInput from "../UI/VxInput.vue";
 
-const {goodsTotal, discount, payTotal, selected, promo, promoApplied} = useCart()
+// Достаем все необходимые реактивные данные и методы из нашего хранилища
+const { goodsTotal, discount, payTotal, selected, promo, applyPromo, promoApplied, promoDiscount, promoError } = useCart()
+const { goToCheckout } = useCustomRoute()
 const promoOpen = ref(true)
 
-const apply = () => {
-  promoApplied.value = promo.value.trim().length > 0
-}
-
 const route = useRoute()
-const router = useRouter()
-const goToCheckout = () => {
-  if (selected.value.length > 0)
-  {
-    router.push('/checkout')
-  }
-}
+const emit = defineEmits(['submit'])
 </script>
 
 <template>
@@ -28,6 +20,7 @@ const goToCheckout = () => {
           <dt>{{ selected.length }} товаров</dt>
           <dd>{{ formatRub(goodsTotal) }}</dd>
         </div>
+        <!-- Скидка магазина (разница между старой и новой ценой товаров) -->
         <div class="line">
           <dt>Скидка</dt>
           <dd class="red">−{{ formatRub(discount) }}</dd>
@@ -37,20 +30,17 @@ const goToCheckout = () => {
           <dd>{{ formatRub(payTotal) }}</dd>
         </div>
       </dl>
-      <button class="checkout" :disabled="!selected.length" @click="goToCheckout" v-if="route.path !== '/checkout'" >
+      <!-- Кнопка видна только на странице корзины (переход на оформление) -->
+      <button class="checkout" :disabled="!selected.length" @click="goToCheckout" v-if="route.path === '/'">
         К оформлению
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
              stroke-linecap="round" stroke-linejoin="round">
           <path d="M5 12h14M13 6l6 6-6 6"/>
         </svg>
       </button>
-
-      <button class="checkout" :disabled="!selected.length" @click="goToCheckout" v-if="route.path !== '/'" >
+      <!-- Кнопка видна только на странице оформления (отправка заказа) -->
+      <button class="checkout" :disabled="!selected.length" @click="emit('submit')" v-if="route.path === '/checkout'" >
         Оформить заказ
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-             stroke-linecap="round" stroke-linejoin="round">
-          <path d="M5 12h14M13 6l6 6-6 6"/>
-        </svg>
       </button>
     </section>
 
@@ -68,11 +58,18 @@ const goToCheckout = () => {
           <path d="M19 12H5M12 19l-7-7 7-7"/>
         </svg>
       </button>
-
+      <!-- Если промокод применен, показываем успех и кнопку отмены -->
       <div v-show="promoOpen" class="promo__body">
-        <VxInput v-model="promo" label="Промокод" placeholder="Введите промокод"/>
-        <button class="apply" @click="apply">Применить</button>
-        <p v-if="promoApplied" class="promo__ok">Промокод принят</p>
+        <div v-if="promoApplied" class="promo__success">
+          <p class="promo__ok">Промокод GROWTASK2026 применен!</p>
+          <button class="promo__cancel" @click="promoApplied = false; promo = ''">Отменить</button>
+        </div>
+
+        <template v-else>
+          <VxInput v-model="promo" label="Промокод" placeholder="Введите промокод"/>
+          <button class="apply" @click="applyPromo">Применить</button>
+          <p v-if="promoError" class="promo__error">{{ promoError }}</p>
+        </template>
       </div>
     </section>
   </aside>
@@ -147,6 +144,41 @@ const goToCheckout = () => {
   font-weight: 700;
 }
 
+.promo__error {
+  margin: 0;
+  font-size: 11px;
+  color: var(--c-red); /* Красный цвет для ошибки */
+}
+
+.promo__success {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  background: #e6f4ea;
+  border-radius: var(--radius-sm);
+}
+
+.promo__success .promo__ok {
+  color: #1f9d55;
+  margin: 0;
+  font-weight: 600;
+}
+
+.promo__cancel {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 11px;
+  text-decoration: underline;
+  cursor: pointer;
+  text-align: left;
+  padding: 0;
+}
+.promo__cancel:hover {
+  color: var(--c-red);
+}
+
 .checkout {
   width: 100%;
   height: 36px;
@@ -159,6 +191,10 @@ const goToCheckout = () => {
   color: #fff;
   font-size: 13px;
   font-weight: 500;
+}
+
+.checkout:hover {
+  background-color: var(--c-icon-price);
 }
 
 .checkout:disabled {
@@ -200,40 +236,6 @@ const goToCheckout = () => {
   flex-direction: column;
   gap: 8px;
   margin-top: 10px;
-}
-
-.field {
-  position: relative;
-  display: block;
-}
-
-.field__cap {
-  display: block;
-  font-size: 9px;
-  color: var(--c-muted);
-  margin-bottom: 3px;
-}
-
-.field__in {
-  width: 100%;
-  height: 36px;
-  padding: 0 32px 0 12px;
-  border: 0;
-  border-radius: var(--radius-sm);
-  background: var(--c-pill);
-  font-size: 12px;
-}
-
-.field__in::placeholder {
-  color: #b3b6bd;
-}
-
-.field__x {
-  position: absolute;
-  right: 12px;
-  bottom: 11px;
-  font-size: 11px;
-  color: #b3b6bd;
 }
 
 .apply {

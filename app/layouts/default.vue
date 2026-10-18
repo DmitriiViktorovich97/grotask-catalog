@@ -3,15 +3,26 @@
 </script>
 
 <template>
-  <header class="cart_page">
+  <div class="layout-wrapper">
+    <AppHeader />
 
-  </header>
+    <main class="main-content">
+      <slot />
+    </main>
+
+    <AppFooter />
+  </div>
 </template>
 
 <style scoped>
-.cart_page {
-  width: 100%;
+.layout-wrapper {
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
-  background: antiquewhite;
-}A
+}
+
+.main-content {
+  flex-grow: 1;
+  width: 100%;
+}
 </style>

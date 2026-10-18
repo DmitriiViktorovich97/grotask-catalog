@@ -1,14 +1,21 @@
-import { useRouter } from "vue-router";
+export default function useCustomRoute() {
+    const router = useRouter()
 
-const router = useRouter()
+    const goToCart= () => {
+        router.push('/')
+    }
 
-const goToCheckout = () => {
-    if (selected.value.length > 0)
-    {
+    const goToCheckout = () => {
         router.push('/checkout')
     }
-}
 
-const goToStatus = () => {
-    router.push('/status')
+    const goToStatus = () => {
+        router.push('/status')
+    }
+
+    return {
+        goToCart,
+        goToCheckout,
+        goToStatus
+    }
 }
