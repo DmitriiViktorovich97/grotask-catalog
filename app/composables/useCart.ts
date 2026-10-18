@@ -15,9 +15,14 @@ export const useCart = () => {
     // Загрузка данных с сервера
     const load = async () => {
         if (items.value.length > 0) return
-
+        let res: { data: ApiProduct[] } | null = null
         const API_URL = "https://growtask.ru/test-front/api/products"
-        const res = await $fetch<{ data: ApiProduct[] }>(API_URL)
+
+        try {
+            res = await $fetch<{ data: ApiProduct[] }>(API_URL)
+        } catch (e) {
+            res = await $fetch<{ data: ApiProduct[] }>('/goods.json')
+        }
 
         // Маппинг данных из API в формат нашего фронтенда.
         items.value = res.data.map(p => ({
