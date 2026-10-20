@@ -6,10 +6,14 @@ defineProps<{
   placeholder?: string
   type?: string
   required?: boolean
+  error?: string
 }>()
+
+const emit = defineEmits<{ (e: 'blur'): void }>()
 
 const clear = () => {
   model.value = ''
+  emit('blur')
 }
 </script>
 
@@ -29,7 +33,9 @@ const clear = () => {
           :type="type || 'text'"
           :placeholder="placeholder"
           class="form-input"
-          :class="{ 'has-icon': $slots.icon }"
+          :class="{ 'has-icon': $slots.icon, 'has-error': !!error }"
+          :aria-invalid="!!error"
+          @blur="emit('blur')"
       >
 
       <button
@@ -42,6 +48,8 @@ const clear = () => {
         ✕
       </button>
     </div>
+
+    <p v-if="error" class="form-error">{{ error }}</p>
   </div>
 </template>
 
@@ -77,6 +85,17 @@ const clear = () => {
   font-size: 14px;
   color: #111;
   transition: border-color 0.2s, background-color 0.2s;
+}
+
+.form-input.has-error {
+  border-color: #e31e24;
+  background-color: #fff;
+}
+
+.form-error {
+  margin: 0;
+  font-size: 12px;
+  color: #e31e24;
 }
 
 .form-input.has-icon {

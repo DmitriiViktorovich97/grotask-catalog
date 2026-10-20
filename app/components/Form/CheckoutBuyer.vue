@@ -3,9 +3,12 @@ import VxInput from "../UI/VxInput.vue";
 import VxCheckbox from "../UI/VxCheckbox.vue";
 
 const form = defineModel<any>({ required: true })
-const clearField = (field: keyof typeof form) => {
-  form[field] = ''
-}
+
+defineProps<{
+  errors: Record<string, string>
+}>()
+
+const emit = defineEmits<{ (e: 'touch', field: 'firstName' | 'lastName' | 'phone' | 'email'): void }>()
 </script>
 
 <template>
@@ -20,20 +23,24 @@ const clearField = (field: keyof typeof form) => {
       <div class="form-grid">
 
         <!-- Имя -->
-        <VxInput v-model="form.firstName" label="Имя" placeholder="Иван" required/>
+        <VxInput v-model="form.firstName" label="Имя" placeholder="Иван" required
+                 :error="errors.firstName" @blur="emit('touch', 'firstName')"/>
 
         <!-- Фамилия -->
-        <VxInput v-model="form.lastName" label="Фамилия" placeholder="Иванов" required/>
+        <VxInput v-model="form.lastName" label="Фамилия" placeholder="Иванов" required
+                 :error="errors.lastName" @blur="emit('touch', 'lastName')"/>
 
         <!-- Телефон -->
-        <VxInput v-model="form.phone" label="Телефон" placeholder="8 800 555 35 35" required>
+        <VxInput v-model="form.phone" label="Телефон" placeholder="8 800 555 35 35" type="tel" required
+                 :error="errors.phone" @blur="emit('touch', 'phone')">
           <template #icon>
             <img src="/phone.svg" alt="phone">
           </template>
         </VxInput>
 
         <!-- Почта -->
-        <VxInput v-model="form.email" label="Почта" placeholder="mail@example.com" required>
+        <VxInput v-model="form.email" label="Почта" placeholder="mail@example.com" type="email" required
+                 :error="errors.email" @blur="emit('touch', 'email')">
           <template #icon>
             <img src="/mail.svg" alt="phone">
           </template>

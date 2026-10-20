@@ -8,6 +8,10 @@ const { goToCheckout } = useCustomRoute()
 const promoOpen = ref(true)
 
 const route = useRoute()
+// Определяем страницу по имени маршрута, а не по path: так слеш на конце (/checkout/) ничего не ломает
+const isCart = computed(() => route.name === 'index')
+const isCheckout = computed(() => route.name === 'checkout')
+defineProps<{ submitDisabled?: boolean }>()
 const emit = defineEmits(['submit'])
 </script>
 
@@ -31,7 +35,7 @@ const emit = defineEmits(['submit'])
         </div>
       </dl>
       <!-- Кнопка видна только на странице корзины (переход на оформление) -->
-      <button class="checkout" :disabled="!selected.length" @click="goToCheckout" v-if="route.path === '/'">
+      <button class="checkout" :disabled="!selected.length" @click="goToCheckout" v-if="isCart">
         К оформлению
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
              stroke-linecap="round" stroke-linejoin="round">
@@ -39,7 +43,7 @@ const emit = defineEmits(['submit'])
         </svg>
       </button>
       <!-- Кнопка видна только на странице оформления (отправка заказа) -->
-      <button class="checkout" :disabled="!selected.length" @click="emit('submit')" v-if="route.path === '/checkout'" >
+      <button class="checkout" :disabled="!selected.length || submitDisabled" @click="emit('submit')" v-if="isCheckout">
         Оформить заказ
       </button>
     </section>

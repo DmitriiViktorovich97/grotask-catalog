@@ -1,4 +1,4 @@
-interface ApiProduct {
+export interface ApiProduct {
     id: number
     name: string
     price: number
@@ -8,36 +8,68 @@ interface ApiProduct {
     quantity: number
 }
 
+export interface CartProduct {
+    id: number
+    name: string
+    sku: string
+    image: string
+    unitPrice: number
+    oldUnitPrice: number
+    qty: number
+    stock: number
+    selected: boolean
+}
+
 export const useCart = () => {
     // Глобальное состояние корзины. Используем useState, чтобы данные сохранялись при переходе между страницами
     const items = useState<CartProduct[]>('cart-items', () => [])
 
-    // Загрузка данных с сервера
+    // Состояние загрузки и ошибки, чтобы страница могла показать понятное сообщение
+    const loading = useState<boolean>('cart-loading', () => false)
+    const loadError = useState<string>('cart-load-error', () => '')
+
+    const API_URL = 'https://growtask.ru/test-front/api/products'
+
+    const fetchProducts = (url: string) =>
+        $fetch<{ data: ApiProduct[] }>(url, { timeout: 5000, retry: 0 })
+
     const load = async () => {
         if (items.value.length > 0) return
+        loading.value = true
+        loadError.value = ''
+
+        const fallbackUrl = useRuntimeConfig().app.baseURL.replace(/\/$/, '') + '/goods.json'
         let res: { data: ApiProduct[] } | null = null
-        const API_URL = "https://growtask.ru/test-front/api/products"
 
         try {
-            res = await $fetch<{ data: ApiProduct[] }>(API_URL)
+            res = await fetchProducts(API_URL)
         } catch (e) {
-            res = await $fetch<{ data: ApiProduct[] }>('/goods.json')
+            try {
+                res = await fetchProducts(fallbackUrl)
+            } catch (e2) {
+                console.error('Не удалось загрузить товары', e2)
+            }
         }
 
-        // Маппинг данных из API в формат нашего фронтенда.
+        if (!res || !Array.isArray(res.data))
+        {
+            loadError.value = 'Не удалось загрузить корзину'
+            loading.value = false
+            return
+        }
+
         items.value = res.data.map(p => ({
             id: p.id,
             name: p.name,
             sku: p.sku,
-            image: p.image.replace(/^http:/, 'https:'),
+            image: (p.image ?? '').replace(/^http:/, 'https:'),
             unitPrice: p.price,
             oldUnitPrice: p.old_price ?? p.price,
             qty: p.quantity > 0 ? 1 : 0,
             stock: p.quantity,
             selected: p.quantity > 0
         }))
-
-        return null
+        loading.value = false
     }
 
     // ЛОГИКА ПРОМОКОДА
@@ -113,6 +145,8 @@ export const useCart = () => {
 
     return {
         load,
+        loading,
+        loadError,
         items,
         promo,
         promoApplied,

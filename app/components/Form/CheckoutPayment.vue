@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const paymentMethod = defineModel<string>({ default: 'online' })
+defineProps<{ disabled?: boolean }>()
 const emit = defineEmits(['submit'])
 </script>
 
@@ -55,12 +56,13 @@ const emit = defineEmits(['submit'])
 
   <!-- Блок с кнопкой -->
   <div class="checkout-action-bar">
-    <button class="submit-btn" @click="emit('submit')">
+    <button class="submit-btn" :disabled="disabled" @click="emit('submit')">
       Оформить заказ
     </button>
     <div class="action-hint">
       <img src="/info.svg" alt="info"/>
-      <span>Вы указали все необходимые данные, теперь можно оформить заказ</span>
+      <span v-if="disabled">Заполните обязательные поля (*), чтобы оформить заказ</span>
+      <span v-else>Вы указали все необходимые данные, теперь можно оформить заказ</span>
     </div>
   </div>
 </template>
@@ -209,7 +211,12 @@ const emit = defineEmits(['submit'])
   white-space: nowrap;
 }
 
-.submit-btn:hover {
+.submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.submit-btn:hover:not(:disabled) {
   background-color: var(--c-icon-price);
 }
 

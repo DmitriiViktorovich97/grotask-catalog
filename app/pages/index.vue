@@ -3,11 +3,15 @@ import VxCrumbs from "../components/UI/VxCrumbs.vue";
 import CardSummary from "../components/Form/CardSummary.vue";
 import VxItemCheckbox from "../components/UI/VxItemCheckbox.vue";
 
-const { items, allSelected, toggleAll, clear } = useCart()
+const { items, allSelected, toggleAll, clear, loading, loadError, load } = useCart()
 </script>
 
 <template>
   <div class="container page">
+    <div class="mobile-bar">
+      <span class="mobile-bar__title">Корзина</span>
+    </div>
+
     <VxCrumbs :items="[{ title: 'Корзина' }]" />
 
     <div class="grid">
@@ -33,9 +37,9 @@ const { items, allSelected, toggleAll, clear } = useCart()
           </button>
         </div>
 
-        <p v-if="pending" class="empty">Загрузка…</p>
-        <p v-else-if="error" class="empty">
-          Не удалось загрузить корзину. <button @click="refresh()">Повторить</button>
+        <p v-if="loading" class="empty">Загрузка…</p>
+        <p v-else-if="loadError" class="empty">
+          Не удалось загрузить корзину. <button class="retry" @click="load()">Повторить</button>
         </p>
         <ul v-else-if="items.length" class="items">
           <CartItem v-for="it in items" :key="it.id" :item="it" />
@@ -124,6 +128,10 @@ const { items, allSelected, toggleAll, clear } = useCart()
   font-size: 14px;
 }
 
+.mobile-bar {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .grid {
     flex-direction: column;
@@ -136,6 +144,30 @@ const { items, allSelected, toggleAll, clear } = useCart()
 
   .pill-hide {
     display: none;
+  }
+
+  .mobile-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--c-line);
+  }
+
+  .mobile-bar__back {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    background: var(--c-pill);
+    color: var(--c-text);
+  }
+
+  .mobile-bar__title {
+    font-size: 14px;
+    font-weight: 600;
   }
 }
 </style>

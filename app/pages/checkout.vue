@@ -5,15 +5,26 @@ import VxCrumbs from "../components/UI/VxCrumbs.vue";
 import CheckoutPayment from "../components/Form/CheckoutPayment.vue";
 import CardSummary from "../components/Form/CardSummary.vue";
 
-const { buyerForm, paymentMethod, submitOrder, error } = useCheckout()
+const { buyerForm, paymentMethod, submitOrder, error, isValid, visibleErrors, touch } = useCheckout()
 </script>
 
 <template>
   <div class="container page">
-    <VxCrumbs :items="[
-      { title: 'Корзина', path: '/' },
-      { title: 'Оформление заказа' }
-    ]" />
+    <div class="mobile-bar">
+      <NuxtLink to="/" class="mobile-bar__back" aria-label="Назад в корзину">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+      </NuxtLink>
+      <span class="mobile-bar__title">Оформление заказа</span>
+    </div>
+
+    <div class="crumbs">
+      <VxCrumbs :items="[
+        { title: 'Корзина', path: '/' },
+        { title: 'Оформление заказа' }
+      ]" />
+    </div>
 
     <div class="checkout-header">
       <NuxtLink to="/" class="back-link">
@@ -30,11 +41,11 @@ const { buyerForm, paymentMethod, submitOrder, error } = useCheckout()
       <section class="list">
 
         <OrderCard/>
-        <CheckoutBuyer v-model="buyerForm"/>
-        <CheckoutPayment v-model="paymentMethod" @submit="submitOrder"/>
+        <CheckoutBuyer v-model="buyerForm" :errors="visibleErrors" @touch="touch"/>
+        <CheckoutPayment v-model="paymentMethod" :disabled="!isValid" @submit="submitOrder"/>
       </section>
 
-      <CardSummary @submit="submitOrder"/>
+      <CardSummary :submit-disabled="!isValid" @submit="submitOrder"/>
     </div>
 
   </div>
@@ -51,6 +62,10 @@ const { buyerForm, paymentMethod, submitOrder, error } = useCheckout()
   gap: var(--col-gap);
   align-items: flex-start;
   margin-top: clamp(20px, 2vw, 40px);
+}
+
+.mobile-bar {
+  display: none;
 }
 
 .checkout-header {
@@ -101,6 +116,45 @@ const { buyerForm, paymentMethod, submitOrder, error } = useCheckout()
 
   .grid > :deep(.side) {
     width: 100%;
+  }
+
+  .mobile-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--c-line);
+  }
+
+  .mobile-bar__back {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    background: var(--c-pill);
+    color: var(--c-text);
+  }
+
+  .mobile-bar__title {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .crumbs,
+  .back-link,
+  .divider {
+    display: none;
+  }
+
+  .checkout-header {
+    padding-top: 16px;
+  }
+
+  .page-title {
+    font-size: 24px;
+    font-weight: 500;
   }
 }
 
